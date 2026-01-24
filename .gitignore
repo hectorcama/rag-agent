@@ -63,7 +63,7 @@ uploads/
 *.temp
 
 # BMM and Cursor
-._bmad_output/
+_bmad-output/
 _bmad/
 
 #IDE
