@@ -1,0 +1,99 @@
+[project]
+name = "rag-agent"
+version = "0.1.0"
+description = "Scientific Knowledge RAG Agent with local deployment and privacy focus"
+authors = [{name = "hcama"}]
+readme = "README.md"
+requires-python = ">=3.11, <3.15"
+dependencies = [
+    
+]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+ruff = "^0.1.9"
+mypy = "^1.15.0"
+pytest = "^8.3.4"
+
+[tool.ruff]
+
+exclude = [".venv", "venv"]
+
+# Same as Black.
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle like errors
+    "F", # pyflakes like errors
+    "B", # flake8-bugbear like errors
+    "I", # Import rules (isort)
+    "A", # Builtin
+    "SIM", # flake8-simplify, rules to simplify your code
+    "FBT", # flake8-boolean-trap, prevent bad boolean use
+    "PTH", # flake8-use-pathlib, promote pathlib use
+    "LOG", # flake8-logging, checks bad logger uses
+    "G", # flake8-logging-format, checks for log format
+    "INP", # flake8-no-pep420, checks for missing __init__.py in packages
+    "PIE", # flake8-pie, checks for unecessary things
+    "T20", # flake8-print, checks for print use in production code
+    "PL", # Apply Pylint rules
+    "UP", # pyupgrade, upgrade syntax for newer versions of the language
+    "FURB", # refurb rules
+    "COM", # flake8-commas, checks on commas
+    "C4", # flake8-comprehensions
+    "N", # pep8-naming, respect naming conventions
+    "D", # pydocstyle
+]
+
+ignore = [
+    "E203", # Whitespace before ':', Black doesn't use it for slicing
+    "E501", # Line too long, for Black compatibility
+    "E701", # Multiple statements on one line (colon)
+    "W191", "Q000", "Q001", "Q002", "Q003", "ISC001", # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "FBT003", # Following issue: https://github.com/astral-sh/ruff/issues/11264
+    "D203", # Incompatible with D211
+    "D213", # Incompatible with D212
+    "D104", # Undocumented public package , too restrictive
+    "D100", # Undocuemented public module, not found of doc on top of modules
+    "D107", # Undocumented __init__ class function, not necessary
+    "D401", # Use only imperative mode for documentation, too restrictive
+    "COM812", # Reundant with formatter: https://docs.astral.sh/ruff/rules/missing-trailing-comma/
+    "FBT001",
+    "FBT002", # Redundant with FBT003 the only boolean trap having ignore options
+    "D405" # Redundant with D400 and we recognize only finish docstrings with period and no ? or !
+]
+
+# D400 Considering adding period mark to docstrings to be safe
+extend-safe-fixes = ["D400"]
+
+[tool.ruff.lint.isort]
+known-first-party = ['rag-agent']
+combine-as-imports = true
+
+# Ignore some calls from boolean trap checks
+# In __init__ functions we often want to have boolean parameters
+[tool.ruff.lint.flake8-boolean-trap]
+extend-allowed-calls = ["__init__"]
+
+
+[tool.ruff.format]
+quote-style = "double"  # Black's preference
+indent-style = "space"  # Black is using space instead of tabs
+
+[tool.mypy]
+python_version = "3.11"
+exclude = [".venv", "venv"]
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["rag-agent"]
