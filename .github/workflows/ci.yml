@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  setup:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup Python 3.12
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Display Python version
+      - name: Display Python version
+        run: python --version
+
+      # Load cached Poetry installation
+      - name: Load cached Poetry Binary
+        id: cached-poetry-binary
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\.local
+          key: poetry-0  # increment to reset cache
+
+      # Install Poetry if not cached
+      - name: Install Poetry
+        if: steps.cached-poetry-binary.outputs.cache-hit != 'true'
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      # Configure Poetry (always run to ensure settings)
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry config virtualenvs.create true
+
+      # Display Poetry version
+      - name: Display Poetry version
+        run: poetry --version
+
+      # Show Poetry config to verify venv location
+      - name: Show Poetry configuration
+        run: poetry config --list
+
+      # Load cached dependencies
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-poetry-0  # increment to reset cache
+          restore-keys: |
+            venv-poetry-
+
+      # Install dependencies with Poetry
+      - name: Install project dependencies
+        run: poetry install --with dev --no-interaction
+
+      # Verify venv location
+      - name: Show virtual environment location
+        run: poetry env info --path
+
+      # Display installed packages
+      - name: Show Poetry packages
+        run: poetry show
