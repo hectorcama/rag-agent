@@ -5,9 +5,7 @@ description = "Scientific Knowledge RAG Agent with local deployment and privacy 
 authors = [{name = "hcama"}]
 readme = "README.md"
 requires-python = ">=3.11, <3.15"
-dependencies = [
-    
-]
+dependencies = []
 package-mode = false
 
 [build-system]
@@ -19,7 +17,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.6.0"
-ruff = "^0.1.9"
+ruff = "^0.14.14"
 mypy = "^1.15.0"
 pytest = "^8.3.4"
 
@@ -76,14 +74,13 @@ ignore = [
 extend-safe-fixes = ["D400"]
 
 [tool.ruff.lint.isort]
-known-first-party = ['rag-agent']
+known-first-party = ['rag_agent']
 combine-as-imports = true
 
 # Ignore some calls from boolean trap checks
 # In __init__ functions we often want to have boolean parameters
-[tool.ruff.lint.flake8-boolean-trap]
-extend-allowed-calls = ["__init__"]
-
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["FBT"]
 
 [tool.ruff.format]
 quote-style = "double"  # Black's preference
@@ -96,4 +93,4 @@ strict = true
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-pythonpath = ["rag-agent"]
+pythonpath = ["rag_agent"]
