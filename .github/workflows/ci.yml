@@ -23,6 +23,7 @@ jobs:
 
       # Setup Python 3.12
       - name: Set up Python 3.12
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -31,22 +32,18 @@ jobs:
       - name: Display Python version
         run: python --version
 
-      # Load cached Poetry installation
-      - name: Load cached Poetry Binary
-        id: cached-poetry-binary
-        uses: actions/cache@v4
-        with:
-          path: C:\Users\runneradmin\.local
-          key: poetry-0  # increment to reset cache
-
-      # Install Poetry if not cached
+      # Install Poetry
       - name: Install Poetry
-        if: steps.cached-poetry-binary.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
+
+      # Ensure Poetry is in PATH for Windows
+      - name: Add Poetry to PATH
+        if: runner.os == 'Windows'
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       # Configure Poetry (always run to ensure settings)
       - name: Configure Poetry
@@ -68,9 +65,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-poetry-0  # increment to reset cache
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            venv-poetry-
+            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
 
       # Install dependencies with Poetry
       - name: Install project dependencies
