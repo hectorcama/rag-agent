@@ -1,0 +1,28 @@
+exclude: ^(.*/\.venv|/venv/.*)
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-toml
+      - id: check-merge-conflict
+        exclude: .*\.py
+      - id: trailing-whitespace
+        exclude: .*\.py
+      - id: end-of-file-fixer
+        exclude: .*\.py | .*\.md
+      - id: check-yaml
+      - id: mixed-line-ending
+        exclude: .*\.py
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic, pydantic-settings]
