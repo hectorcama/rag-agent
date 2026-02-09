@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "Scientific Knowledge RAG Agent with local deployment and privacy focus"
 authors = [{name = "hcama"}]
 readme = "README.md"
-requires-python = ">=3.11, <3.15"
-dependencies = []
+requires-python = ">=3.11, <3.13"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "unstructured[all-docs]>=0.10.0",
+]
 package-mode = false
 
 [build-system]
