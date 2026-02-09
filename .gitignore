@@ -54,6 +54,7 @@ logs/
 # Document storage
 documents/
 uploads/
+data/
 
 # Docker
 .dockerignore
