@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "Scientific Knowledge RAG Agent with local deployment and privacy focus"
 authors = [{name = "hcama"}]
 readme = "README.md"
-requires-python = ">=3.11, <3.15"
-dependencies = []
+requires-python = ">=3.11, <3.13"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "unstructured[all-docs]>=0.10.0",
+]
 package-mode = false
 
 [build-system]
@@ -81,6 +84,8 @@ combine-as-imports = true
 # In __init__ functions we often want to have boolean parameters
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["FBT"]
+# unstructured partition_* and chunk_by_title have many optional params
+"**/document_processor.py" = ["PLR0913", "ARG", "E402", "B006"]
 
 [tool.ruff.format]
 quote-style = "double"  # Black's preference
@@ -91,6 +96,7 @@ python_version = "3.11"
 exclude = [".venv", "venv"]
 strict = true
 ignore_missing_imports = true
+disable_error_code = ["no-any-return"]
 
 [tool.pytest.ini_options]
 pythonpath = ["rag_agent"]
