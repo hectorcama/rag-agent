@@ -84,6 +84,8 @@ combine-as-imports = true
 # In __init__ functions we often want to have boolean parameters
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["FBT"]
+# unstructured partition_* and chunk_by_title have many optional params
+"**/document_processor.py" = ["PLR0913", "ARG", "E402", "B006"]
 
 [tool.ruff.format]
 quote-style = "double"  # Black's preference
@@ -94,6 +96,7 @@ python_version = "3.11"
 exclude = [".venv", "venv"]
 strict = true
 ignore_missing_imports = true
+disable_error_code = ["no-any-return"]
 
 [tool.pytest.ini_options]
 pythonpath = ["rag_agent"]
