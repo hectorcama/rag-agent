@@ -7,6 +7,7 @@ readme = "README.md"
 requires-python = ">=3.11, <3.13"
 dependencies = [
     "python-dotenv>=1.0.0",
+    "sentence-transformers>=2.2.0",
     "unstructured[all-docs]>=0.10.0",
 ]
 package-mode = false
