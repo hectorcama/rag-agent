@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
     branches:
-      - '**'
+      - "**"
 
 jobs:
   setup:
@@ -80,3 +80,37 @@ jobs:
       # Display installed packages
       - name: Show Poetry packages
         run: poetry show
+
+  test:
+    runs-on: windows-latest
+    needs: setup # waits for setup to complete successfully
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      # Restore cached venv from setup job
+      - name: Load cached venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Run tests
+        run: poetry run pytest -v -s --tb=long
