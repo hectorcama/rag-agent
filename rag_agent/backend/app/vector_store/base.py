@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Protocol
 
-from backend.app.models.chunk import Chunk
+from backend.app.models.chunk import DocumentChunk
 from backend.app.models.document import Document
-from backend.app.models.embedding import Embedding
 
 
 class VectorStoreBackend(Protocol):
@@ -17,19 +16,21 @@ class VectorStoreBackend(Protocol):
         """Add or update a document in the store."""
         ...
 
-    def add_chunks(self, chunks: list[Chunk]) -> None:
+    def add_chunks(self, chunks: list[DocumentChunk]) -> None:
         """Add chunks to the store (metadata only; use add_embeddings for vectors)."""
         ...
 
-    def add_embeddings(self, chunk_ids: list[str], embeddings: list[Embedding]) -> None:
+    def add_embeddings(
+        self, chunk_ids: list[str], embeddings: list[list[float]]
+    ) -> None:
         """Add embedding vectors for the given chunk IDs."""
         ...
 
-    def get_chunk(self, chunk_id: str) -> Chunk | None:
+    def get_chunk(self, chunk_id: str) -> DocumentChunk | None:
         """Retrieve a chunk by ID."""
         ...
 
-    def get_chunks_by_document(self, document_id: str) -> list[Chunk]:
+    def get_chunks_by_document(self, document_id: str) -> list[DocumentChunk]:
         """Retrieve all chunks for a document, sorted by chunk_index."""
         ...
 
@@ -42,13 +43,12 @@ class VectorStoreBackend(Protocol):
         ...
 
     def search(
-        self, query_embedding: Embedding, k: int = 5
-    ) -> list[tuple[Chunk, float]]:
+        self, query_embedding: list[float], k: int = 5
+    ) -> list[tuple[str, float]]:
         """Search for similar chunks by embedding.
 
         Returns:
             List of (chunk_id, distance) sorted by distance ascending.
-            Lower distance = more similar.
 
         """
         ...
@@ -75,22 +75,24 @@ class AbstractVectorStoreBackend(ABC):
         ...
 
     @abstractmethod
-    def add_chunks(self, chunks: list[Chunk]) -> None:
+    def add_chunks(self, chunks: list[DocumentChunk]) -> None:
         """Add chunks to the store."""
         ...
 
     @abstractmethod
-    def add_embeddings(self, chunk_ids: list[str], embeddings: list[Embedding]) -> None:
+    def add_embeddings(
+        self, chunk_ids: list[str], embeddings: list[list[float]]
+    ) -> None:
         """Add embedding vectors for the given chunk IDs."""
         ...
 
     @abstractmethod
-    def get_chunk(self, chunk_id: str) -> Chunk | None:
+    def get_chunk(self, chunk_id: str) -> DocumentChunk | None:
         """Retrieve a chunk by ID."""
         ...
 
     @abstractmethod
-    def get_chunks_by_document(self, document_id: str) -> list[Chunk]:
+    def get_chunks_by_document(self, document_id: str) -> list[DocumentChunk]:
         """Retrieve all chunks for a document."""
         ...
 
@@ -106,8 +108,8 @@ class AbstractVectorStoreBackend(ABC):
 
     @abstractmethod
     def search(
-        self, query_embedding: Embedding, k: int = 5
-    ) -> list[tuple[Chunk, float]]:
+        self, query_embedding: list[float], k: int = 5
+    ) -> list[tuple[str, float]]:
         """Search for similar chunks by embedding."""
         ...
 

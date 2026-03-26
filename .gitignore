@@ -69,4 +69,4 @@ _bmad/
 
 #IDE
 .vscode/
-.cursor/
+.cursor/commands/

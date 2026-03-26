@@ -7,6 +7,7 @@ readme = "README.md"
 requires-python = ">=3.11, <3.13"
 dependencies = [
     "python-dotenv>=1.0.0",
+    "chromadb>=0.5.0",
     "sentence-transformers>=2.2.0",
     "unstructured[all-docs]>=0.10.0",
 ]
@@ -101,3 +102,5 @@ disable_error_code = ["no-any-return"]
 
 [tool.pytest.ini_options]
 pythonpath = ["rag_agent"]
+testpaths = ["rag_agent/tests"]
+addopts = "-v -s --tb=long"
