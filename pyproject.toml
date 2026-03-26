@@ -88,6 +88,7 @@ combine-as-imports = true
 "**/__init__.py" = ["FBT"]
 # unstructured partition_* and chunk_by_title have many optional params
 "**/document_processor.py" = ["PLR0913", "ARG", "E402", "B006"]
+"**/ingestion_service.py" = ["PLR0913", "ARG", "E402", "B006"]
 
 [tool.ruff.format]
 quote-style = "double"  # Black's preference
