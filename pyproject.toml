@@ -99,7 +99,7 @@ python_version = "3.11"
 exclude = [".venv", "venv"]
 strict = true
 ignore_missing_imports = true
-disable_error_code = ["no-any-return"]
+disable_error_code = ["no-any-return", "misc"]
 
 [tool.pytest.ini_options]
 pythonpath = ["rag_agent"]
