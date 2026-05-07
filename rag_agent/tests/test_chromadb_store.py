@@ -11,7 +11,10 @@ from backend.app.vector_store.chromadb_store import ChromaDBStore
 
 @pytest.fixture
 def store(tmp_path: Path) -> ChromaDBStore:
-    """ChromaDB store under a per-test temp dir; pytest removes tmp_path after the test."""
+    """ChromaDB store under a per-test temp dir.
+
+    pytest removes tmp_path after the test.
+    """
     return ChromaDBStore(
         persist_directory=str(tmp_path / "chroma"),
         dimension=384,

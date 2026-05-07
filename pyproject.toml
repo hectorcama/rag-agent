@@ -6,10 +6,10 @@ authors = [{name = "hcama"}]
 readme = "README.md"
 requires-python = ">=3.11, <3.13"
 dependencies = [
-    "python-dotenv>=1.0.0",
     "chromadb>=0.5.0",
     "sentence-transformers>=2.2.0",
     "unstructured[all-docs]>=0.10.0",
+    "pydantic-settings (>=2.14.0,<3.0.0)",
 ]
 package-mode = false
 
@@ -59,14 +59,13 @@ select = [
 
 ignore = [
     "E203", # Whitespace before ':', Black doesn't use it for slicing
-    "E501", # Line too long, for Black compatibility
     "E701", # Multiple statements on one line (colon)
     "W191", "Q000", "Q001", "Q002", "Q003", "ISC001", # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
     "FBT003", # Following issue: https://github.com/astral-sh/ruff/issues/11264
     "D203", # Incompatible with D211
     "D213", # Incompatible with D212
     "D104", # Undocumented public package , too restrictive
-    "D100", # Undocuemented public module, not found of doc on top of modules
+    "D100", # Undocumented public module, not found of doc on top of modules
     "D107", # Undocumented __init__ class function, not necessary
     "D401", # Use only imperative mode for documentation, too restrictive
     "COM812", # Reundant with formatter: https://docs.astral.sh/ruff/rules/missing-trailing-comma/
@@ -88,7 +87,13 @@ combine-as-imports = true
 "**/__init__.py" = ["FBT"]
 # unstructured partition_* and chunk_by_title have many optional params
 "**/document_processor.py" = ["PLR0913", "ARG", "E402", "B006"]
+"**/embedding_service.py" = ["E402"]
 "**/ingestion_service.py" = ["PLR0913", "ARG", "E402", "B006"]
+# CLI: env must load before backend/unstructured; prints are the UI
+"rag_agent/main.py" = ["E402", "T201"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.format]
 quote-style = "double"  # Black's preference

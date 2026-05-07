@@ -8,8 +8,8 @@ from backend.app.models.document import Document
 class VectorStoreBackend(Protocol):
     """Protocol for vector store backends (local or remote).
 
-    Implementations must support metadata storage (documents, chunks) and
-    vector search (embeddings, similarity search).
+    Implementations must support metadata storage (documents, chunks) and vector search
+    (embeddings, similarity search).
     """
 
     def add_document(self, document: Document) -> None:
@@ -42,6 +42,10 @@ class VectorStoreBackend(Protocol):
         """List all documents in the store."""
         ...
 
+    def list_chunks(self) -> list[DocumentChunk]:
+        """List all indexed chunks, typically sorted by document_id then chunk_index."""
+        ...
+
     def search(
         self, query_embedding: list[float], k: int = 5
     ) -> list[tuple[str, float]]:
@@ -49,7 +53,6 @@ class VectorStoreBackend(Protocol):
 
         Returns:
             List of (chunk_id, distance) sorted by distance ascending.
-
         """
         ...
 
@@ -58,15 +61,19 @@ class VectorStoreBackend(Protocol):
         ...
 
     def remove_chunks(self, chunk_ids: list[str]) -> None:
-        """Remove chunk vectors from the index (metadata is deleted via delete_document)."""
+        """Remove chunk vectors from the index.
+
+        Metadata is deleted via delete_document.
+
+        """
         ...
 
 
 class AbstractVectorStoreBackend(ABC):
     """Abstract base class for vector store backends.
 
-    Use this when you need to enforce implementation via inheritance
-    (e.g. for shared helper methods). Otherwise use VectorStoreBackend Protocol.
+    Use this when you need to enforce implementation via inheritance (e.g. for shared
+    helper methods). Otherwise use VectorStoreBackend Protocol.
     """
 
     @abstractmethod
@@ -104,6 +111,11 @@ class AbstractVectorStoreBackend(ABC):
     @abstractmethod
     def list_documents(self) -> list[Document]:
         """List all documents."""
+        ...
+
+    @abstractmethod
+    def list_chunks(self) -> list[DocumentChunk]:
+        """List all indexed chunks."""
         ...
 
     @abstractmethod

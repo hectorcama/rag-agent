@@ -219,10 +219,36 @@ class ChromaDBStore:
             )
         ]
 
+    def list_chunks(self) -> list[DocumentChunk]:
+        """List all indexed chunks, sorted by document_id then chunk_index."""
+        n = self._chunks.count()
+        if n == 0:
+            return []
+        result = self._chunks.get(
+            include=["documents", "metadatas"],
+            limit=n,
+        )
+        if not result["ids"]:
+            return []
+        chunks = [
+            _metadata_to_chunk(cid, doc, meta)
+            for cid, doc, meta in zip(
+                result["ids"],
+                result["documents"] or [""] * len(result["ids"]),
+                result["metadatas"] or [{}] * len(result["ids"]),
+                strict=True,
+            )
+        ]
+        chunks.sort(key=lambda c: (c.document_id, c.chunk_index))
+        return chunks
+
     def search(
         self, query_embedding: list[float], k: int = 5
     ) -> list[tuple[str, float]]:
-        """Search for similar chunks by embedding. Returns (chunk_id, distance)."""
+        """Search for similar chunks by embedding.
+
+        Returns (chunk_id, distance).
+        """
         result = self._chunks.query(
             query_embeddings=[query_embedding],
             n_results=min(k, self._chunks.count()),

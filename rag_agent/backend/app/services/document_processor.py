@@ -1,19 +1,12 @@
-import os
 import shutil
 import warnings
 from pathlib import Path
 from typing import Literal
 
-from dotenv import load_dotenv
+from backend.app.settings import apply_runtime_env
 
-# Load .env file before accessing environment variables
-env_path = Path(__file__).parent.parent.parent.parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
-
-# Set telemetry defaults if not already loaded from .env
-# Critical: These must be set before importing unstructured
-os.environ.setdefault("SCARF_NO_ANALYTICS", "true")
-os.environ.setdefault("DO_NOT_TRACK", "true")
+# Critical: process env before unstructured imports
+apply_runtime_env()
 
 from unstructured.chunking.title import chunk_by_title
 from unstructured.documents.elements import Element
@@ -27,8 +20,8 @@ from unstructured.partition.text import partition_text
 class DocumentProcessor:
     """Handles document ingestion and processing using unstructured.
 
-    Supports PDF, Word, Markdown, and Text documents with French and English language support.
-    Implements context-aware partitioning and chunking strategies.
+    Supports PDF, Word, Markdown, and Text documents with French and English language
+    support. Implements context-aware partitioning and chunking strategies.
     """
 
     # Supported file extensions
@@ -47,7 +40,6 @@ class DocumentProcessor:
 
         Args:
             output_dir: Directory to save processed markdown files.
-
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +57,6 @@ class DocumentProcessor:
 
         Raises:
             ValueError: If file type is not supported.
-
         """
         file_path_obj = Path(file_path)
         extension = file_path_obj.suffix.lower()
@@ -92,13 +83,13 @@ class DocumentProcessor:
 
         Args:
             file_path: Path to the document.
-            file_type: Type of document (markdown, pdf, docx, text).
+            file_type: Type of document (Markdown, PDF, docx, text).
             languages: List of Tesseract language codes for OCR.
-            strategy: Partitioning strategy (for PDFs: "auto", "fast", "hi_res", "ocr_only").
+            strategy: Partitioning strategy
+            (for PDFs: "auto", "fast", "hi_res", "ocr_only").
 
         Returns:
             List of document elements.
-
         """
         file_path_str = str(file_path)
 
@@ -117,8 +108,10 @@ class DocumentProcessor:
             # Warn if OCR strategy is requested but Tesseract is not available
             if needs_ocr and not tesseract_available:
                 warnings.warn(
-                    "Tesseract not found in PATH. OCR strategies (hi_res, ocr_only) require Tesseract. "
-                    "Falling back to 'fast' strategy. Install Tesseract and add it to PATH: "
+                    "Tesseract not found in PATH. "
+                    "OCR strategies (hi_res, ocr_only) require Tesseract. "
+                    "Falling back to 'fast' strategy. "
+                    "Install Tesseract and add it to PATH: "
                     "https://github.com/UB-Mannheim/tesseract/wiki",
                     UserWarning,
                     stacklevel=2,
@@ -129,7 +122,9 @@ class DocumentProcessor:
             if tesseract_available:
                 kwargs["languages"] = languages
 
-            # Set strategy (default to "fast" if not specified and Tesseract unavailable)
+            # Set strategy
+            # (default to "fast" if not specified
+            # and Tesseract unavailable)
             if strategy:
                 kwargs["strategy"] = strategy
             elif not tesseract_available:
@@ -155,7 +150,6 @@ class DocumentProcessor:
 
         Returns:
             Markdown string representation of the elements.
-
         """
         markdown_content = ""
 
@@ -200,7 +194,6 @@ class DocumentProcessor:
 
         Returns:
             List of markdown elements.
-
         """
         # Create a temporary file-like object or use text parameter
         # partition_md can accept text directly
@@ -227,7 +220,6 @@ class DocumentProcessor:
 
         Returns:
             List of chunked elements.
-
         """
         if chunking_strategy == "by_title":
             return chunk_by_title(
@@ -251,7 +243,9 @@ class DocumentProcessor:
         multipage_sections: bool = True,
         pdf_strategy: str | None = None,
     ) -> list[Element]:
-        """Process a document through the full pipeline: partition → convert → partition → chunk.
+        """Process a document through the full pipeline.
+
+        Partition to convert to partition to chunk.
 
         Args:
             file_path: Path to the document (PDF, DOCX, MD, TXT).
@@ -261,7 +255,8 @@ class DocumentProcessor:
             new_after_n_chars: Soft maximum chunk size.
             combine_text_under_n_chars: Combine small sections under this size.
             multipage_sections: Whether to respect page boundaries.
-            pdf_strategy: Partitioning strategy for PDFs ("auto", "fast", "hi_res", "ocr_only").
+            pdf_strategy: Partitioning strategy for PDFs
+            ("auto", "fast", "hi_res", "ocr_only").
 
         Returns:
             List of chunked elements ready for embedding/indexing.
