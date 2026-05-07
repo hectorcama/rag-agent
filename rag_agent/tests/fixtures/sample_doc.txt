@@ -1,0 +1,5 @@
+Machine Learning Basics
+
+Machine learning is a subset of artificial intelligence. It enables computers to learn from data without explicit programming. Common applications include image recognition, natural language processing, and recommendation systems.
+
+Supervised learning uses labeled training data. Unsupervised learning finds patterns in unlabeled data.

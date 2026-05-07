@@ -5,8 +5,8 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-class Chunk(BaseModel):
-    """Represents a chunk of a document with metadata."""
+class DocumentChunk(BaseModel):
+    """Chunk of a document for vector storage and retrieval."""
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     document_id: str = Field(

@@ -69,4 +69,10 @@ _bmad/
 
 #IDE
 .vscode/
-.cursor/
+.cursor/commands/
+
+# npm
+skills-lock.json
+
+# caveman
+.agents/

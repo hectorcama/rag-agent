@@ -1,42 +1,71 @@
+from backend.app.settings import apply_runtime_env, get_settings
+
+apply_runtime_env()
+
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.cross_encoder import CrossEncoder
+
+
+def _resolve_hf_token(explicit: str | None) -> str | None:
+    """Token for Hugging Face Hub (gated/private models).
+
+    Reads settings if not passed.
+    """
+    if explicit is not None:
+        stripped = explicit.strip()
+        return stripped or None
+    return get_settings().hf_token
 
 
 class EmbeddingService:
     """Service for generating embeddings and reranking.
 
-    Uses a bi-encoder (SentenceTransformer) for encoding documents and queries
-    into embeddings. Uses a cross-encoder for reranking candidate results
-    to improve retrieval accuracy.
+    Uses a bi-encoder (SentenceTransformer) for encoding documents and queries into
+    embeddings. Uses a cross-encoder for reranking candidate results to improve
+    retrieval accuracy.
     """
 
     def __init__(
         self,
         biencoder_model: str = "all-MiniLM-L6-v2",
         cross_encoder_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
+        hf_token: str | None = None,
     ):
         """Initialize the embedding service.
 
         Args:
             biencoder_model: Name of the bi-encoder model for embeddings.
             cross_encoder_model: Name of the cross-encoder model for reranking.
-
+            hf_token: Hugging Face Hub token. If None, uses ``HF_TOKEN`` or
+                ``HUGGING_FACE_HUB_TOKEN`` from the environment (after ``.env``).
         """
         self.biencoder_model_name = biencoder_model
         self.cross_encoder_model_name = cross_encoder_model
+        self._hf_token = _resolve_hf_token(hf_token)
         self._biencoder: SentenceTransformer | None = None
         self._cross_encoder: CrossEncoder | None = None
         self._dimension = 384  # Dimension for all-MiniLM-L6-v2
 
+    def _hub_kwargs(self) -> dict[str, str]:
+        if self._hf_token is None:
+            return {}
+        return {"token": self._hf_token}
+
     def _load_biencoder(self) -> None:
         """Lazy load the bi-encoder on first use."""
         if self._biencoder is None:
-            self._biencoder = SentenceTransformer(self.biencoder_model_name)
+            self._biencoder = SentenceTransformer(
+                self.biencoder_model_name,
+                **self._hub_kwargs(),
+            )
 
     def _load_cross_encoder(self) -> None:
         """Lazy load the cross-encoder on first use."""
         if self._cross_encoder is None:
-            self._cross_encoder = CrossEncoder(self.cross_encoder_model_name)
+            self._cross_encoder = CrossEncoder(
+                self.cross_encoder_model_name,
+                **self._hub_kwargs(),
+            )
 
     @property
     def dimension(self) -> int:
@@ -51,7 +80,6 @@ class EmbeddingService:
 
         Returns:
             List of floats representing the embedding vector.
-
         """
         self._load_biencoder()
         if self._biencoder is None:
@@ -68,7 +96,6 @@ class EmbeddingService:
 
         Returns:
             List of embedding vectors.
-
         """
         if not texts:
             return []
@@ -97,7 +124,6 @@ class EmbeddingService:
 
         Returns:
             List of (chunk_id, content, score) sorted by score descending.
-
         """
         if not candidates:
             return []

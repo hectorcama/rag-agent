@@ -6,14 +6,10 @@ repos:
     hooks:
       - id: check-toml
       - id: check-merge-conflict
-        exclude: .*\.py
-      - id: trailing-whitespace
-        exclude: .*\.py
       - id: end-of-file-fixer
-        exclude: .*\.py | .*\.md
+        exclude: .*\.md
       - id: check-yaml
       - id: mixed-line-ending
-        exclude: .*\.py
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
